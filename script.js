@@ -67,6 +67,8 @@ const ballSpeedValue = document.getElementById('ball-speed-value');
 const ballColorValue = document.getElementById('ball-color-value');
 const bgColorValue = document.getElementById('bg-color-value');
 
+boxSizeInput.max = screen.width;
+
 function updateBoxSize(size) {
   W = size;
   H = size;
