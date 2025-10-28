@@ -39,9 +39,11 @@ function step(now) {
   if (x + radius >= W) {
     x = W - radius;
     vx = -Math.abs(vx);
+    playSound();
   } else if (x - radius <= 0) {
     x = radius;
     vx = Math.abs(vx);
+    playSound();
   }
 
   draw();
@@ -66,6 +68,8 @@ const ballSizeValue = document.getElementById('ball-size-value');
 const ballSpeedValue = document.getElementById('ball-speed-value');
 const ballColorValue = document.getElementById('ball-color-value');
 const bgColorValue = document.getElementById('bg-color-value');
+const soundEnabledInput = document.getElementById('sound-enabled');
+const plinkSound = document.getElementById('plink-sound');
 
 boxSizeInput.max = screen.width;
 
@@ -107,6 +111,13 @@ bgColorInput.addEventListener('input', (e) => {
   bgColorValue.textContent = e.target.value;
 });
 
+function playSound() {
+  if (soundEnabledInput.checked) {
+    plinkSound.currentTime = 0;
+    plinkSound.play();
+  }
+}
+
 saveButton.addEventListener('click', () => {
   const defaults = {
     boxSize: boxSizeInput.value,
@@ -114,6 +125,7 @@ saveButton.addEventListener('click', () => {
     ballSpeed: ballSpeedInput.value,
     ballColor: ballColorInput.value,
     bgColor: bgColorInput.value,
+    soundEnabled: soundEnabledInput.checked,
   };
   localStorage.setItem('emdr-defaults', JSON.stringify(defaults));
 });
@@ -139,6 +151,8 @@ function loadDefaults() {
     canvas.style.backgroundColor = defaults.bgColor;
     bgColorInput.value = defaults.bgColor;
     bgColorValue.textContent = defaults.bgColor;
+
+    soundEnabledInput.checked = defaults.soundEnabled;
   }
 }
 

@@ -22,7 +22,6 @@ html,body{
   align-items:center;
   justify-content:center;
   background:transparent;
-  box-shadow:0 8px 20px rgba(0,0,0,0.4);
   padding:16px;
   box-sizing:border-box;
 }
@@ -32,6 +31,7 @@ canvas{
   border:4px solid #222;
   border-radius:6px;
   display:block;
+  will-change: transform;
 }
 
 .controls {

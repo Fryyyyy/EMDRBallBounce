@@ -23,7 +23,7 @@
     </div>
     <div>
       <label for="ball-speed">Ball Speed</label>
-      <input type="range" id="ball-speed" min="50" max="5000" value="200">
+      <input type="range" id="ball-speed" min="50" max="10000" value="200">
       <span id="ball-speed-value">200px/s</span>
     </div>
     <div>
@@ -37,9 +37,17 @@
       <span id="bg-color-value">#f7f7f7</span>
     </div>
     <div>
+      <label for="sound-enabled">Play Sound</label>
+      <input type="checkbox" id="sound-enabled" checked>
+    </div>
+    <div>
       <button id="save-defaults">Save as Default</button>
     </div>
   </div>
+  <audio id="plink-sound" src="beep.mp3" preload="auto"></audio>
   <script src="script.js"></script>
 </body>
 </html>
+
+:10 - :11
+:19 - :20
