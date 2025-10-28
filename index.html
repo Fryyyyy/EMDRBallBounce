@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Horizontal Bouncing Ball</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="stage">
+    <canvas id="box" width="400" height="400"></canvas>
+  </div>
+  <div class="controls">
+    <div>
+      <label for="box-size">Box Size</label>
+      <input type="range" id="box-size" min="100" max="800" value="400">
+      <span id="box-size-value">400px</span>
+    </div>
+    <div>
+      <label for="ball-size">Ball Size</label>
+      <input type="range" id="ball-size" min="5" max="100" value="20">
+      <span id="ball-size-value">20px</span>
+    </div>
+    <div>
+      <label for="ball-speed">Ball Speed</label>
+      <input type="range" id="ball-speed" min="50" max="1000" value="200">
+      <span id="ball-speed-value">200px/s</span>
+    </div>
+    <div>
+      <label for="ball-color">Ball Color</label>
+      <input type="color" id="ball-color" value="#ff5722">
+      <span id="ball-color-value">#ff5722</span>
+    </div>
+    <div>
+      <label for="bg-color">Background Color</label>
+      <input type="color" id="bg-color" value="#f7f7f7">
+      <span id="bg-color-value">#f7f7f7</span>
+    </div>
+    <div>
+      <button id="save-defaults">Save as Default</button>
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
