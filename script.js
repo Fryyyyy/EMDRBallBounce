@@ -17,7 +17,7 @@ const ballSpeedValue = document.getElementById('ball-speed-value');
 const ballColorValue = document.getElementById('ball-color-value');
 const bgColorValue = document.getElementById('bg-color-value');
 const soundEnabledInput = document.getElementById('sound-enabled');
-const plinkSound = document.getElementById('plink-sound');
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
 boxSizeInput.max = screen.width;
 
@@ -77,8 +77,19 @@ let soundInterval;
 
 function playSound() {
   if (soundEnabledInput.checked) {
-    plinkSound.currentTime = 0;
-    plinkSound.play();
+    const oscillator = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(440, audioCtx.currentTime); // A4
+    gainNode.gain.setValueAtTime(1, audioCtx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.5);
+
+    oscillator.start(audioCtx.currentTime);
+    oscillator.stop(audioCtx.currentTime + 0.5);
   }
 }
 
