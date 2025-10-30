@@ -1,37 +1,48 @@
-:root{
-  --size: 400px;
-  --bg: #111;
-  --box-bg: #f7f7f7;
-  --ball: #ff5722;
+:root {
+  --box-size: 400px;
+  --ball-size: 20px;
+  --ball-speed: 2s;
+  --ball-color: #ff5722;
+  --bg-color: #f7f7f7;
 }
 
-html,body{
-  height:100%;
-  margin:0;
-  background:var(--bg);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial;
+html, body {
+  height: 100%;
+  margin: 0;
+  background: #111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: system-ui, Segoe UI, Roboto, Helvetica, Arial;
 }
 
-.stage{
-  width:var(--size);
-  height:var(--size);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:transparent;
-  padding:16px;
-  box-sizing:border-box;
+.stage {
+  width: var(--box-size);
+  height: var(--box-size);
+  background: var(--bg-color);
+  border: 4px solid #222;
+  border-radius: 6px;
+  position: relative;
 }
 
-canvas{
-  background:var(--box-bg);
-  border:4px solid #222;
-  border-radius:6px;
-  display:block;
-  will-change: transform;
+#ball {
+  width: var(--ball-size);
+  height: var(--ball-size);
+  background-color: var(--ball-color);
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 0;
+  animation: bounce var(--ball-speed) linear infinite alternate;
+}
+
+@keyframes bounce {
+  from {
+    transform: translate(0, -50%);
+  }
+  to {
+    transform: translate(calc(var(--box-size) - var(--ball-size)), -50%);
+  }
 }
 
 .controls {
@@ -46,6 +57,11 @@ canvas{
   flex-direction: column;
   gap: 12px;
   min-width: 320px;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.fade-out {
+  opacity: 0;
 }
 
 .controls div {
@@ -77,7 +93,7 @@ canvas{
   font-size: 14px;
 }
 
-#save-defaults {
+.button {
   grid-column: 1 / -1;
   padding: 10px;
   background: #4CAF50;
@@ -89,6 +105,6 @@ canvas{
   margin-top: 10px;
 }
 
-#save-defaults:hover {
+.button:hover {
   background: #45a049;
 }

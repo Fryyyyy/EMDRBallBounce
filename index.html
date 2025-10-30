@@ -8,7 +8,7 @@
 </head>
 <body>
   <div class="stage">
-    <canvas id="box" width="400" height="400"></canvas>
+    <div id="ball"></div>
   </div>
   <div class="controls">
     <div>
@@ -18,7 +18,7 @@
     </div>
     <div>
       <label for="ball-size">Ball Size</label>
-      <input type="range" id="ball-size" min="5" max="100" value="20">
+      <input type="range" id="ball-size" min="0" max="100" value="20">
       <span id="ball-size-value">20px</span>
     </div>
     <div>
@@ -41,7 +41,13 @@
       <input type="checkbox" id="sound-enabled" checked>
     </div>
     <div>
-      <button id="save-defaults">Save as Default</button>
+      <button class="button" id="save-defaults">Save as Default</button>
+    </div>
+    <div>
+      <button class="button" id="pause-ball">Pause</button>
+    </div>
+    <div>
+      <button class="button" id="toggle-ball">Remove Ball</button>
     </div>
   </div>
   <audio id="plink-sound" src="beep.mp3" preload="auto"></audio>
@@ -49,5 +55,3 @@
 </body>
 </html>
 
-:10 - :11
-:19 - :20

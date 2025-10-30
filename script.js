@@ -1,59 +1,4 @@
-const canvas = document.getElementById('box');
-const ctx = canvas.getContext('2d');
-const stage = document.querySelector('.stage');
-
-let W = canvas.width;
-let H = canvas.height;
-
-let radius = 20;
-let x = radius + 10; // start near left
-let y = H / 2;
-let vx = 200; // pixels per second (positive -> right)
-let ballColor = '#ff5722';
-
-let last = performance.now();
-
-function draw() {
-  ctx.clearRect(0, 0, W, H);
-
-  // draw ball
-  ctx.beginPath();
-  ctx.fillStyle = ballColor;
-  ctx.arc(x, y, radius, 0, Math.PI * 2);
-  ctx.fill();
-
-  // draw left/right guidelines (optional)
-  ctx.strokeStyle = 'rgba(0,0,0,0.08)';
-  ctx.lineWidth = 1;
-  ctx.strokeRect(0.5, 0.5, W - 1, H - 1);
-}
-
-function step(now) {
-  const dt = (now - last) / 1000; // seconds
-  last = now;
-
-  // update position horizontally only
-  x += vx * dt;
-
-  // bounce on left/right edges
-  if (x + radius >= W) {
-    x = W - radius;
-    vx = -Math.abs(vx);
-    playSound();
-  } else if (x - radius <= 0) {
-    x = radius;
-    vx = Math.abs(vx);
-    playSound();
-  }
-
-  draw();
-  requestAnimationFrame(step);
-}
-
-requestAnimationFrame(step);
-
-// Optional: click to toggle direction
-canvas.addEventListener('click', () => { vx = -vx; });
+const ball = document.getElementById('ball');
 
 // Controls
 const boxSizeInput = document.getElementById('box-size');
@@ -62,6 +7,9 @@ const ballSpeedInput = document.getElementById('ball-speed');
 const ballColorInput = document.getElementById('ball-color');
 const bgColorInput = document.getElementById('bg-color');
 const saveButton = document.getElementById('save-defaults');
+const pauseButton = document.getElementById('pause-ball');
+const removeAddButton = document.getElementById('toggle-ball');
+const controls = document.querySelector('.controls');
 
 const boxSizeValue = document.getElementById('box-size-value');
 const ballSizeValue = document.getElementById('ball-size-value');
@@ -73,43 +21,59 @@ const plinkSound = document.getElementById('plink-sound');
 
 boxSizeInput.max = screen.width;
 
-function updateBoxSize(size) {
-  W = size;
-  H = size;
-  canvas.width = W;
-  canvas.height = H;
-  stage.style.width = `${size}px`;
-  stage.style.height = `${size}px`;
-  y = H / 2;
-  boxSizeInput.value = size;
-  boxSizeValue.textContent = `${size}px`;
+function setCSSVar(name, value) {
+  document.documentElement.style.setProperty(name, value);
+}
+
+const soundOffset = 50; // ms
+
+function updateBallAnimation() {
+  const boxSize = parseInt(boxSizeInput.value, 10);
+  const ballSize = parseInt(ballSizeInput.value, 10);
+  const speed = parseInt(ballSpeedInput.value, 10);
+
+  const distance = boxSize - ballSize;
+  if (distance <= 0 || speed <= 0) {
+    setCSSVar('--ball-speed', '0s'); // Or some other sensible default to stop animation
+    ballSpeedValue.textContent = `${speed}px/s`;
+    return;
+  }
+
+  const duration = distance / speed;
+  setCSSVar('--ball-speed', `${duration}s`);
+  ballSpeedValue.textContent = `${speed}px/s`;
+
+  clearInterval(soundInterval);
+  soundInterval = setInterval(playSound, duration * 1000 - soundOffset);
 }
 
 boxSizeInput.addEventListener('input', (e) => {
-  const size = parseInt(e.target.value, 10);
-  updateBoxSize(size);
+  const size = `${e.target.value}px`;
+  setCSSVar('--box-size', size);
+  boxSizeValue.textContent = size;
+  updateBallAnimation();
 });
 
 ballSizeInput.addEventListener('input', (e) => {
-  radius = parseInt(e.target.value, 10);
-  ballSizeValue.textContent = `${radius}px`;
+  const size = `${e.target.value}px`;
+  setCSSVar('--ball-size', size);
+  ballSizeValue.textContent = size;
+  updateBallAnimation();
 });
 
-ballSpeedInput.addEventListener('input', (e) => {
-  const speed = parseInt(e.target.value, 10);
-  vx = vx > 0 ? speed : -speed;
-  ballSpeedValue.textContent = `${speed}px/s`;
-});
+ballSpeedInput.addEventListener('input', updateBallAnimation);
 
 ballColorInput.addEventListener('input', (e) => {
-  ballColor = e.target.value;
-  ballColorValue.textContent = ballColor;
+  setCSSVar('--ball-color', e.target.value);
+  ballColorValue.textContent = e.target.value;
 });
 
 bgColorInput.addEventListener('input', (e) => {
-  canvas.style.backgroundColor = e.target.value;
+  setCSSVar('--bg-color', e.target.value);
   bgColorValue.textContent = e.target.value;
 });
+
+let soundInterval;
 
 function playSound() {
   if (soundEnabledInput.checked) {
@@ -117,6 +81,8 @@ function playSound() {
     plinkSound.play();
   }
 }
+
+
 
 saveButton.addEventListener('click', () => {
   const defaults = {
@@ -130,30 +96,85 @@ saveButton.addEventListener('click', () => {
   localStorage.setItem('emdr-defaults', JSON.stringify(defaults));
 });
 
+function initialize() {
+  boxSizeInput.dispatchEvent(new Event('input'));
+  ballSizeInput.dispatchEvent(new Event('input'));
+  ballSpeedInput.dispatchEvent(new Event('input'));
+  ballColorInput.dispatchEvent(new Event('input'));
+  bgColorInput.dispatchEvent(new Event('input'));
+  updateBallAnimation();
+}
+
 function loadDefaults() {
   const defaults = JSON.parse(localStorage.getItem('emdr-defaults'));
   if (defaults) {
-    updateBoxSize(parseInt(defaults.boxSize, 10));
-    
-    radius = parseInt(defaults.ballSize, 10);
-    ballSizeInput.value = radius;
-    ballSizeValue.textContent = `${radius}px`;
+    boxSizeInput.value = defaults.boxSize;
+    boxSizeInput.dispatchEvent(new Event('input'));
 
-    const speed = parseInt(defaults.ballSpeed, 10);
-    vx = vx > 0 ? speed : -speed;
-    ballSpeedInput.value = speed;
-    ballSpeedValue.textContent = `${speed}px/s`;
+    ballSizeInput.value = defaults.ballSize;
+    ballSizeInput.dispatchEvent(new Event('input'));
 
-    ballColor = defaults.ballColor;
-    ballColorInput.value = ballColor;
-    ballColorValue.textContent = ballColor;
+    ballSpeedInput.value = defaults.ballSpeed;
+    ballSpeedInput.dispatchEvent(new Event('input'));
 
-    canvas.style.backgroundColor = defaults.bgColor;
+    ballColorInput.value = defaults.ballColor;
+    ballColorInput.dispatchEvent(new Event('input'));
+
     bgColorInput.value = defaults.bgColor;
-    bgColorValue.textContent = defaults.bgColor;
+    bgColorInput.dispatchEvent(new Event('input'));
 
     soundEnabledInput.checked = defaults.soundEnabled;
   }
 }
 
+initialize();
 loadDefaults();
+
+let isPaused = false;
+
+pauseButton.addEventListener('click', () => {
+  isPaused = !isPaused;
+  if (isPaused) {
+    ball.style.animationPlayState = 'paused';
+    pauseButton.textContent = 'Resume';
+    clearInterval(soundInterval);
+  } else {
+    ball.style.animationPlayState = 'running';
+    pauseButton.textContent = 'Pause';
+    const duration = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ball-speed'));
+    soundInterval = setInterval(playSound, duration * 1000 - soundOffset);
+  }
+});
+
+let isBallVisible = true;
+
+removeAddButton.addEventListener('click', () => {
+  isBallVisible = !isBallVisible;
+  if (isBallVisible) {
+    ball.style.display = 'block';
+    removeAddButton.textContent = 'Remove Ball';
+  } else {
+    ball.style.display = 'none';
+    removeAddButton.textContent = 'Show Ball';
+  }
+});
+
+let fadeOutTimer;
+
+function showControls() {
+  controls.classList.remove('fade-out');
+}
+
+function hideControls() {
+  controls.classList.add('fade-out');
+}
+
+function resetFadeOutTimer() {
+  clearTimeout(fadeOutTimer);
+  showControls();
+  fadeOutTimer = setTimeout(hideControls, 2000);
+}
+
+document.addEventListener('mousemove', resetFadeOutTimer);
+
+resetFadeOutTimer();
