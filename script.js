@@ -8,7 +8,7 @@ const ballColorInput = document.getElementById('ball-color');
 const bgColorInput = document.getElementById('bg-color');
 const saveButton = document.getElementById('save-defaults');
 const pauseButton = document.getElementById('pause-ball');
-const removeAddButton = document.getElementById('toggle-ball');
+const toggleBallButton = document.getElementById('toggle-ball');
 const controls = document.querySelector('.controls');
 
 const boxSizeValue = document.getElementById('box-size-value');
@@ -63,15 +63,21 @@ ballSizeInput.addEventListener('input', (e) => {
 
 ballSpeedInput.addEventListener('input', updateBallAnimation);
 
-ballColorInput.addEventListener('input', (e) => {
-  setCSSVar('--ball-color', e.target.value);
-  ballColorValue.textContent = e.target.value;
-});
+function updateBallColor(color) {
+  setCSSVar('--ball-color', color);
+  ballColorValue.textContent = color;
+  ballColorInput.value = color;
+}
 
-bgColorInput.addEventListener('input', (e) => {
-  setCSSVar('--bg-color', e.target.value);
-  bgColorValue.textContent = e.target.value;
-});
+function updateBgColor(color) {
+  setCSSVar('--bg-color', color);
+  bgColorValue.textContent = color;
+  bgColorInput.value = color;
+}
+
+ballColorInput.addEventListener('input', (e) => updateBallColor(e.target.value));
+
+bgColorInput.addEventListener('input', (e) => updateBgColor(e.target.value));
 
 let soundInterval;
 
@@ -111,8 +117,8 @@ function initialize() {
   boxSizeInput.dispatchEvent(new Event('input'));
   ballSizeInput.dispatchEvent(new Event('input'));
   ballSpeedInput.dispatchEvent(new Event('input'));
-  ballColorInput.dispatchEvent(new Event('input'));
-  bgColorInput.dispatchEvent(new Event('input'));
+  updateBallColor(ballColorInput.value);
+  updateBgColor(bgColorInput.value);
   updateBallAnimation();
 }
 
@@ -128,18 +134,18 @@ function loadDefaults() {
     ballSpeedInput.value = defaults.ballSpeed;
     ballSpeedInput.dispatchEvent(new Event('input'));
 
-    ballColorInput.value = defaults.ballColor;
-    ballColorInput.dispatchEvent(new Event('input'));
+    updateBallColor(defaults.ballColor);
 
-    bgColorInput.value = defaults.bgColor;
-    bgColorInput.dispatchEvent(new Event('input'));
+    updateBgColor(defaults.bgColor);
 
     soundEnabledInput.checked = defaults.soundEnabled;
   }
 }
 
-initialize();
-loadDefaults();
+document.addEventListener('DOMContentLoaded', () => {
+  initialize();
+  loadDefaults();
+});
 
 let isPaused = false;
 
@@ -159,14 +165,14 @@ pauseButton.addEventListener('click', () => {
 
 let isBallVisible = true;
 
-removeAddButton.addEventListener('click', () => {
+toggleBallButton.addEventListener('click', () => {
   isBallVisible = !isBallVisible;
   if (isBallVisible) {
     ball.style.display = 'block';
-    removeAddButton.textContent = 'Remove Ball';
+    toggleBallButton.textContent = 'Remove Ball';
   } else {
     ball.style.display = 'none';
-    removeAddButton.textContent = 'Show Ball';
+    toggleBallButton.textContent = 'Show Ball';
   }
 });
 
