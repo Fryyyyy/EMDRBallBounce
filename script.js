@@ -1,5 +1,7 @@
 const ball = document.getElementById('ball');
 
+
+
 // Controls
 const boxSizeInput = document.getElementById('box-size');
 const ballSizeInput = document.getElementById('ball-size');
@@ -25,8 +27,6 @@ function setCSSVar(name, value) {
   document.documentElement.style.setProperty(name, value);
 }
 
-const soundOffset = 50; // ms
-
 function updateBallAnimation() {
   const boxSize = parseInt(boxSizeInput.value, 10);
   const ballSize = parseInt(ballSizeInput.value, 10);
@@ -42,9 +42,6 @@ function updateBallAnimation() {
   const duration = distance / speed;
   setCSSVar('--ball-speed', `${duration}s`);
   ballSpeedValue.textContent = `${speed}px/s`;
-
-  clearInterval(soundInterval);
-  soundInterval = setInterval(playSound, duration * 1000 - soundOffset);
 }
 
 boxSizeInput.addEventListener('input', (e) => {
@@ -79,7 +76,7 @@ ballColorInput.addEventListener('input', (e) => updateBallColor(e.target.value))
 
 bgColorInput.addEventListener('input', (e) => updateBgColor(e.target.value));
 
-let soundInterval;
+
 
 function playSound() {
   if (soundEnabledInput.checked) {
@@ -98,6 +95,8 @@ function playSound() {
     oscillator.stop(audioCtx.currentTime + 0.5);
   }
 }
+
+ball.addEventListener('animationiteration', playSound);
 
 
 
@@ -154,24 +153,20 @@ pauseButton.addEventListener('click', () => {
   if (isPaused) {
     ball.style.animationPlayState = 'paused';
     pauseButton.textContent = 'Resume';
-    clearInterval(soundInterval);
   } else {
     ball.style.animationPlayState = 'running';
     pauseButton.textContent = 'Pause';
-    const duration = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ball-speed'));
-    soundInterval = setInterval(playSound, duration * 1000 - soundOffset);
   }
 });
 
 let isBallVisible = true;
 
 toggleBallButton.addEventListener('click', () => {
+  ball.classList.toggle('hidden');
   isBallVisible = !isBallVisible;
   if (isBallVisible) {
-    ball.style.display = 'block';
     toggleBallButton.textContent = 'Remove Ball';
   } else {
-    ball.style.display = 'none';
     toggleBallButton.textContent = 'Show Ball';
   }
 });
